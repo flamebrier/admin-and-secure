@@ -1,67 +1,74 @@
-import 'dart:developer';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 final String alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-/*final List<String> alphabet = ['а','б','в','г','д','е','ё','ж','з','и','й','к',
-  'л','м', 'н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э',
-  'ю','я'];*/
-Future<String> vigenerCrypt (
+
+Stream<String> vigenerEncrypt (
     String text,
-    {@required String key}
-    ) async {
-  String modText = "";
-  key.trim();
+    {
+      @required String key,
+      int m,
+    }
+    ) async* {
+  key = key.trim().toLowerCase();
   if (key == "") {
-    return modText;
+    yield text;
   }
+  if (m < key.length) {
+    key = key.substring(0, m);
+  } else {
+    m = key.length;
+  }
+
   List<String> sourceAlphabet = [];
-  for (var a=0; a < key.length; a++) {
+  for (var a=0; a < m; a++) {
     sourceAlphabet.add(alphabet.substring(alphabet.indexOf(key[a]))
         + alphabet.substring(0, alphabet.indexOf(key[a])));
   }
 
- // List<int> textList = text.codeUnits;
-
   for (int i = 0, letters = 0, tmp; i < text.length; i++, letters++) {
     if ((tmp = alphabet.indexOf(text[i])) >= 0) {
-      modText += sourceAlphabet[letters % key.length][tmp];
+      yield sourceAlphabet[letters % m][tmp];
     } else if ((tmp = alphabet.indexOf(text[i].toLowerCase())) >= 0) {
-      modText += sourceAlphabet[letters % key.length][tmp].toUpperCase();
+      yield sourceAlphabet[letters % m][tmp].toUpperCase();
     } else {
       letters--;
-      modText += text[i];
+      yield text[i];
     }
   }
-  return modText;
 }
 
-Future<String> vigenerDecrypt (
+Stream<String> vigenerDecrypt (
     String text,
-    {@required String key}
-    ) async {
-  String modText = "";
-  key.trim();
+    {
+      @required String key,
+      int m,
+    }
+    ) async* {
+  key = key.trim().toLowerCase();
   if (key == "") {
-    return modText;
+    yield text;
   }
+  if (m < key.length) {
+    key = key.substring(0, m);
+  } else {
+    m = key.length;
+  }
+
   List<String> sourceAlphabet = [];
-  for (var a=0; a < key.length; a++) {
+  for (var a=0; a < m; a++) {
     sourceAlphabet.add(alphabet.substring(alphabet.indexOf(key[a]))
         + alphabet.substring(0, alphabet.indexOf(key[a])));
   }
 
   for (var i = 0, letters = 0, tmp; i < text.length; i++, letters++) {
-    if ((tmp = sourceAlphabet[i % key.length].indexOf(text[i])) >= 0) {
-      modText += alphabet[tmp];
-    } else if ((tmp = sourceAlphabet[i % key.length]
+    if ((tmp = sourceAlphabet[letters % m].indexOf(text[i])) >= 0) {
+      yield alphabet[tmp];
+    } else if ((tmp = sourceAlphabet[letters % m]
         .indexOf(text[i].toLowerCase())) >= 0) {
-      modText += alphabet[tmp].toUpperCase();
+      yield alphabet[tmp].toUpperCase();
     } else {
       letters--;
-      modText += text[i];
+      yield text[i];
     }
   }
-  return modText;
 }

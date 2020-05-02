@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lab4/algorythms.dart';
 
 void main() {
@@ -6,17 +7,16 @@ void main() {
 }
 
 class CryptApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Шифрование',
+      title: 'Шифрование Виженера',
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.amber,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CryptPage(title: 'Шифрование'),
+      home: CryptPage(title: 'Шифрование Виженера'),
     );
   }
 }
@@ -28,9 +28,12 @@ class CryptPage extends StatelessWidget {
   final TextEditingController inputController = TextEditingController();
   final TextEditingController outputController = TextEditingController();
   final TextEditingController keyController = TextEditingController();
+  final TextEditingController mController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    keyController.addListener(() {mController.text =
+        keyController.text.length.toString();});
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -43,6 +46,15 @@ class CryptPage extends StatelessWidget {
                 width: 400,
                 child: Column(
                   children: <Widget>[
+                    TextFormField(
+                      controller: mController,
+                      maxLength: 1,
+                      inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                      decoration: InputDecoration(
+                        labelText: 'Длина сдвига',
+                        icon: Icon(Icons.label_important),
+                      ),
+                    ),
                     TextFormField(
                       controller: keyController,
                       decoration: InputDecoration(
@@ -67,10 +79,12 @@ class CryptPage extends StatelessWidget {
                           color: Colors.amber,
                           splashColor: Colors.amberAccent,
                           onPressed: () async {
-                            outputController.text = await vigenerCrypt(
-                                inputController.text,
-                                key: keyController.text
-                            );
+                            outputController.clear();
+                            await vigenerEncrypt(
+                              inputController.text,
+                              key: keyController.text,
+                              m: int.tryParse(mController.text) ?? 0,
+                            ).forEach((event) => outputController.text += event);
                           },
                         ),
                         OutlineButton(
@@ -78,10 +92,12 @@ class CryptPage extends StatelessWidget {
                           highlightedBorderColor: Colors.amber,
                           borderSide: BorderSide(color: Colors.amber),
                           onPressed: () async {
-                            outputController.text = await vigenerDecrypt(
-                                inputController.text,
-                                key: keyController.text
-                            );
+                            outputController.clear();
+                            await vigenerDecrypt(
+                              inputController.text,
+                              key: keyController.text,
+                              m: int.tryParse(mController.text) ?? 0,
+                            ).forEach((event) => outputController.text += event);
                           },
                         )
                       ],
@@ -93,9 +109,8 @@ class CryptPage extends StatelessWidget {
                 width: 400,
                 child: TextFormField(
                   controller: outputController,
-                  readOnly: true,
                   minLines: 1,
-                  maxLines: 18,
+                  maxLines: 20,
                   decoration: InputDecoration(
                     labelText: 'Полученный текст',
                     icon: Icon(Icons.security),
