@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -20,19 +22,15 @@ Future<String> vigenerCrypt (
         + alphabet.substring(0, alphabet.indexOf(key[a])));
   }
 
-  int tmp;
-  int a;
-  int letters = 0;
+ // List<int> textList = text.codeUnits;
 
-  for (var i = 0; i < text.length; i++) {
-    a = letters % key.length;
-    if ((tmp = alphabet.indexOf(text[i])) > 0) {
-      letters++;
-      modText += sourceAlphabet[a][tmp];
-    } else if ((tmp = alphabet.indexOf(text[i].toLowerCase())) > 0) {
-      letters++;
-      modText += sourceAlphabet[a][tmp].toUpperCase();
+  for (int i = 0, letters = 0, tmp; i < text.length; i++, letters++) {
+    if ((tmp = alphabet.indexOf(text[i])) >= 0) {
+      modText += sourceAlphabet[letters % key.length][tmp];
+    } else if ((tmp = alphabet.indexOf(text[i].toLowerCase())) >= 0) {
+      modText += sourceAlphabet[letters % key.length][tmp].toUpperCase();
     } else {
+      letters--;
       modText += text[i];
     }
   }
@@ -54,16 +52,14 @@ Future<String> vigenerDecrypt (
         + alphabet.substring(0, alphabet.indexOf(key[a])));
   }
 
-  int tmp;
-  int a;
-
-  for (var i = 0; i < text.length; i++) {
-    a = i % key.length;
-    if ((tmp = sourceAlphabet[a].indexOf(text[i])) > 0) {
+  for (var i = 0, letters = 0, tmp; i < text.length; i++, letters++) {
+    if ((tmp = sourceAlphabet[i % key.length].indexOf(text[i])) >= 0) {
       modText += alphabet[tmp];
-    } else if ((tmp = sourceAlphabet[a].indexOf(text[i].toLowerCase())) > 0) {
+    } else if ((tmp = sourceAlphabet[i % key.length]
+        .indexOf(text[i].toLowerCase())) >= 0) {
       modText += alphabet[tmp].toUpperCase();
     } else {
+      letters--;
       modText += text[i];
     }
   }
