@@ -32,10 +32,10 @@ class CryptPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SizedBox(
-          height: 300,
-          child: Row(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -53,24 +53,38 @@ class CryptPage extends StatelessWidget {
                     TextFormField(
                       controller: inputController,
                       minLines: 3,
-                      maxLines: 7,
+                      maxLines: 15,
                       decoration: InputDecoration(
                         labelText: 'Исходный текст',
                         icon: Icon(Icons.assignment),
                       ),
                     ),
-                    FlatButton(
-                      child: Text('Зашифровать'),
-                      color: Colors.amber,
-                      splashColor: Colors.amberAccent,
-                      onPressed: () async {
-                        outputController.text = (keyController.text == "")
-                            ? await vigenerCrypt(inputController.text)
-                            : await vigenerCrypt(
-                            inputController.text,
-                            key: keyController.text
-                        );
-                      },
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget> [
+                        FlatButton(
+                          child: Text('Зашифровать'),
+                          color: Colors.amber,
+                          splashColor: Colors.amberAccent,
+                          onPressed: () async {
+                            outputController.text = await vigenerCrypt(
+                                inputController.text,
+                                key: keyController.text
+                            );
+                          },
+                        ),
+                        OutlineButton(
+                          child: Text('Дешифровать'),
+                          highlightedBorderColor: Colors.amber,
+                          borderSide: BorderSide(color: Colors.amber),
+                          onPressed: () async {
+                            outputController.text = await vigenerDecrypt(
+                                inputController.text,
+                                key: keyController.text
+                            );
+                          },
+                        )
+                      ],
                     ),
                   ],
                 ),
@@ -81,16 +95,16 @@ class CryptPage extends StatelessWidget {
                   controller: outputController,
                   readOnly: true,
                   minLines: 1,
-                  maxLines: 10,
+                  maxLines: 18,
                   decoration: InputDecoration(
-                    labelText: 'Зашифрованный текст',
+                    labelText: 'Полученный текст',
                     icon: Icon(Icons.security),
                   ),
                 ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
