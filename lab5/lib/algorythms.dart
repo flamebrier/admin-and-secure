@@ -33,7 +33,7 @@ Stream<String> reshuffleEncrypt (
     if (alphabet.indexOf(text[i]) >= 0) {
       table[a] += text[i];
     } else {
-      letters--;
+      letters--; // для лучшего шифрования учитываем только буквы
     }
   }
 
@@ -70,17 +70,20 @@ Stream<String> reshuffleDecrypt (
   int l = 0;
   for (int a = 0; a < m; a++) {
     tmp = arrange.indexOf(a); // номер заполняемого столбца
-    for (int i = 0; i < text.length/m + ((text.length % m > tmp) ? 1 : 0); i++) {
-      table[tmp] += text[l++];
+    for (int i = 0;
+    i < ((text.length/m).truncate() + ((tmp < (text.length % m) ? 1 : 0)));
+    i++, l++) {
+      table[tmp] += text[l];
     }
   }
 
-  tmp = 0;
-  while (tmp < text.length) {
-    for (var i = 0; i < table.length; i++) {
-      yield table[i][(tmp/m).truncate() +
-          ((tmp - m*((tmp/m).truncate())) > 0 ? 1 : 0)];
-      tmp++;
+
+  l = 0;
+  tmp = 0; // номер буквы в столбце
+  while (l < text.length) {
+    for (var i = 0; i < table.length && l < text.length; i++, l++) {
+      yield table[i][tmp];
     }
+    tmp++;
   }
 }
