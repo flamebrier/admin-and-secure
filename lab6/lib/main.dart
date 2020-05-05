@@ -10,13 +10,13 @@ class CryptApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Шифрование перестановкой',
+      title: 'Шифрование гаммированием',
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.amber,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CryptPage(title: 'Шифрование перестановкой'),
+      home: CryptPage(title: 'Шифрование гаммированием'),
     );
   }
 }
@@ -50,8 +50,9 @@ class CryptPage extends StatelessWidget {
                     TextFormField(
                       controller: keyController,
                       decoration: InputDecoration(
-                        labelText: 'Ключ',
+                        labelText: 'Гамма',
                         icon: Icon(Icons.vpn_key),
+                        hintText: 'Числа через пробел',
                       ),
                     ),
                     TextFormField(
