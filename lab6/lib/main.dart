@@ -86,7 +86,7 @@ class CryptPage extends StatelessWidget {
                             outputController.clear();
                             await gammaDecrypt(
                               inputController.text,
-                              key: keyController.text,
+                              gamma: keyController.text,
                             ).forEach((event) => outputController.text += event);
                           },
                         )
