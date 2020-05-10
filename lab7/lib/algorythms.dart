@@ -25,6 +25,18 @@ Stream<int> wordToCodes(String word) async* {
   }
 }
 
+List<double> listToLength(List<double> list, int counter) {
+  int tmp;
+  int length = list.length;
+  if ((tmp = (length % counter)) > 0) {
+    tmp = counter - tmp;
+    for (int i = 0; i < tmp; i++) {
+      list.add(-1);
+    }
+  }
+  return list;
+}
+
 Stream<String> matrixEncrypt (
     String text,
     {
@@ -35,6 +47,7 @@ Stream<String> matrixEncrypt (
     }
     ) async* {
   bool is4 = row4.isNotEmpty;
+  int count = (is4) ? 4 : 3;
   text = text.toUpperCase();
 
   List<double> list = List<double>();
@@ -48,8 +61,9 @@ Stream<String> matrixEncrypt (
     List<Vector4> vectorText = List<Vector4>();
     list.clear();
     await wordToCodes(text).forEach((element) {list.add(element.toDouble());});
-    
-    int count = 4;
+
+    list = listToLength(list, count);
+
     for (int i = 0; (i + count - 1) < list.length; i += count) {
       vectorText.add(Vector4.array(list.getRange(i, i + count).toList()));
     }
@@ -67,7 +81,7 @@ Stream<String> matrixEncrypt (
     list.clear();
     await wordToCodes(text).forEach((element) {list.add(element.toDouble());});
 
-    int count = 3;
+    list = listToLength(list, count);
     for (int i = 0; (i + count - 1) < list.length; i += count) {
       vectorText.add(Vector3.array(list.getRange(i, i + count).toList()));
     }
@@ -91,5 +105,38 @@ Stream<String> matrixDecrypt (
       String row4
     }
     ) async* {
+  bool is4 = row4.isNotEmpty;
+  int count = (is4) ? 4 : 3;
+  text = text.toUpperCase().trim();
 
+  List<double> list = List<double>();
+  await stringToRow(row1).forEach((element) {list.add(element);});
+  await stringToRow(row2).forEach((element) {list.add(element);});
+  await stringToRow(row3).forEach((element) {list.add(element);});
+  if (is4) {
+    await stringToRow(row4).forEach((element) {list.add(element);});
+
+    Matrix4 keyMatrix = Matrix4.fromList(list);
+    Matrix4 invertMatrix = Matrix4.inverted(keyMatrix);
+    List<Vector4> vectorText = List<Vector4>();
+    list.clear();
+    var tmpList = text.split(' ');
+    for (String element in tmpList) {
+      list.add(double.parse(element).roundToDouble());
+    }
+
+    for (int i = 0; (i + count - 1) < list.length; i += count) {
+      vectorText.add(Vector4.array(list.getRange(i, i + count).toList()));
+    }
+
+    Vector tmp;
+    for (Vector vector in vectorText) {
+      tmp = invertMatrix * vector;
+      for (double i in tmp.storage) {
+        if (i >= 0) {yield upperAlphabet[i.round()];}
+      }
+    }
+  } else {
+    yield 'Дешифровка доступна только для матриц 4х4';
+  }
 }
