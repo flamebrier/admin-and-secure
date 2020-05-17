@@ -122,7 +122,7 @@ Stream<String> matrixDecrypt (
     list.clear();
     var tmpList = text.split(' ');
     for (String element in tmpList) {
-      list.add(double.parse(element).roundToDouble());
+      list.add(double.tryParse(element).roundToDouble());
     }
 
     for (int i = 0; (i + count - 1) < list.length; i += count) {
